@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VELO.CORE - Ultimate iPhone Portfolio Dashboard</title>
+    <style>
+        /* 1. DESIGN SYSTEM & MODERN ÜVEGHATÁS (GLASSMORPHISM) */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at top right, #1E1B4B 0%, #090A0F 60%);
+            color: #E2E8F0;
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 2. SIDEBAR STÍLUS */
+        .sidebar {
+            width: 280px;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 35px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h2 {
+            font-size: 1.3rem;
+            color: #FFFFFF;
+            margin-bottom: 40px;
+            letter-spacing: 4px;
+            font-weight: 800;
+            text-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .nav-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            color: #94A3B8;
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+            color: #FFFFFF;
+        }
+
+        .nav-link.active {
+            background: linear-gradient(90deg, rgba(139, 92, 246, 0.2) 0%, transparent 100%);
+            color: #A78BFA;
+            border-left: 4px solid #8B5CF6;
+            padding-left: 14px;
+        }
+
+        .badge {
+            background: #8B5CF6;
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        /* 3. FŐ TARTALOM */
+        .content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        .btn-neon {
+            background: transparent;
+            color: #22D3EE;
+            border: 1px solid #22D3EE;
+            padding: 12px 26px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .btn-neon:hover {
+            background: #22D3EE;
+            color: #090A0F;
+            box-shadow: 0 0 25px rgba(34, 211, 238, 0.5);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 26px;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            color: #94A3B8;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        /* 4. BENTO GRID MULTI-CARD PANEL */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .portfolio-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 280px;
+            text-align: center;
+            cursor: pointer; /* Mutatja, hogy kattintható */
+        }
+
+        .portfolio-box img {
+            max-height: 160px;
+            object-fit: contain;
+            margin: 15px 0;
+            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.5));
+        }
+
+        .stat-value {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .stat-green { color: #34D399; font-size: 0.95rem; margin-top: 8px; font-weight: 600; }
+
+        .mock-chart {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+            margin-top: 25px;
+            position: relative;
+        }
+        .mock-chart-fill {
+            position: absolute;
+            top: 0; left: 0; height: 100%;
+            width: 82%;
+            background: linear-gradient(90deg, #8B5CF6, #22D3EE);
+            border-radius: 3px;
+        }
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        /* 5. WEBSHOP / CONFIGURATOR STÍLUS */
+        .shop-container {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 30px;
+        }
+
+        .price-tag {
+            font-size: 2.2rem;
+            color: #22D3EE;
+            font-weight: 800;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
+        }
+
+        .config-section { margin-bottom: 20px; }
+        .config-section label {
+            display: block;
+            color: #94A3B8;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .selector-group { display: flex; gap: 12px; flex-wrap: wrap; }
+        .selector-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: white;
+            padding: 12px 22px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .selector-btn.active, .selector-btn:hover {
+            border-color: #8B5CF6;
+            background: rgba(139, 92, 246, 0.15);
+            color: #A78BFA;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+        }
+
+        .checkout-form { display: flex; flex-direction: column; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.85rem; color: #94A3B8; }
+        .form-group input {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.2s;
+        }
+        .form-group input:focus {
+            border-color: #22D3EE;
+            box-shadow: 0 0 12px rgba(34, 211, 238, 0.2);
+        }
+        .row-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        .btn-submit {
+            background: linear-gradient(90deg, #8B5CF6, #22D3EE);
+            color: #090A0F;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 20px rgba(34, 211, 238, 0.2);
+            transition: 0.25s ease;
+        }
+        .btn-submit:hover {
+            transform: scale(1.01);
+            box-shadow: 0 4px 25px rgba(34, 211, 238, 0.5);
+        }
+
+        /* 6. ADMIN TÁBLÁZAT */
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .admin-table th, .admin-table td {
+            padding: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .admin-table th {
+            color: #94A3B8;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+        .admin-table td { color: white; font-size: 0.95rem; }
+        .status-badge {
+            background: rgba(52, 211, 153, 0.15);
+            color: #34D399;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: -100px;
+            right: 40px;
+            background: #10B981;
+            color: white;
+            padding: 16px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+        }
+        .toast.show { bottom: 40px; }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <h2>VELO.CORE</h2>
+        <nav>
+            <div class="nav-link active" data-target="atekintes" id="menu-atekintes">Áttekintés</div>
+            <div class="nav-link" data-target="webshop" id="menu-webshop">Webshop / Shop <span class="badge" id="cart-count">0</span></div>
+            <div class="nav-link" data-target="analitika">Analitika (Live Admin)</div>
+            <div class="nav-link" data-target="beallitasok">Beállítások</div>
+        </nav>
+    </aside>
+
+    <main class="content">
+        
+        <div id="atekintes" class="tab-panel active">
+            <header class="header">
+                <h1>iPhone Termékportfólió - Teljesítmény</h1>
+                <button class="btn-neon" onclick="showToast('✓ Globális jelentés frissítve!')">Frissítés ↻</button>
+            </header>
+
+            <div class="grid-container">
+                <div class="card portfolio-box" onclick="navigateToModel('iPhone 16', 349900, 'iphone16.png', 0)">
+                    <h3 style="width:100%; text-align:left;">iPhone 16 (Bázis)</h3>
+                    <img src="iphone16.png" alt="iPhone 16">
+                    <p style="font-size:0.85rem; color:#94A3B8;">A18 Bionic • Stabil piacvezető</p>
+                </div>
+
+                <div class="card portfolio-box" onclick="navigateToModel('iPhone 17', 449900, 'iphone17.png', 1)">
+                    <h3 style="width:100%; text-align:left;">iPhone 17</h3>
+                    <img src="iphone17.png" alt="iPhone 17">
+                    <p style="font-size:0.85rem; color:#94A3B8;">A19 Proton • Standard Változat</p>
+                </div>
+
+                <div class="card portfolio-box" onclick="navigateToModel('iPhone 17 Pro', 549900, 'iphone171.png', 2)">
+                    <h3 style="width:100%; text-align:left;">iPhone 17 Pro</h3>
+                    <img src="iphone171.png" alt="iPhone 17 Pro">
+                    <p style="font-size:0.85rem; color:#A78BFA; font-weight:bold;">160Hz ProMotion X • Csúcsmodell</p>
+                </div>
+            </div>
+
+            <div class="bottom-grid">
+                <div class="card">
+                    <h3>Összesített Heti Eladási Index</h3>
+                    <div class="stat-value">+24%</div>
+                    <div class="stat-green">▲ Kimagasló globális kereslet</div>
+                </div>
+                <div class="card">
+                    <h3>Aktív Eszközök a Hálózaton</h3>
+                    <div class="stat-value">12,400</div>
+                    <div class="mock-chart"><div class="mock-chart-fill"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="webshop" class="tab-panel">
+            <header class="header">
+                <h1>VELO.CORE Checkout Engine</h1>
+            </header>
+
+            <div class="shop-container">
+                <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h2 id="display-model-name">iPhone 17 Pro</h2>
+                        <div class="price-tag" id="display-price">549 900 Ft</div>
+                        
+                        <div style="text-align: center; margin: 20px 0; min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                            <img src="iphone171.png" id="shop-phone-img" alt="iPhone" style="max-height: 190px; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.5)); transition: 0.3s;">
+                        </div>
+
+                        <div class="config-section">
+                            <label>Eszköz Modell Kiválasztása</label>
+                            <div class="selector-group" id="model-selector-group">
+                                <button class="selector-btn" onclick="selectModel('iPhone 16', 349900, 'iphone16.png', this)">iPhone 16</button>
+                                <button class="selector-btn" onclick="selectModel('iPhone 17', 449900, 'iphone17.png', this)">iPhone 17</button>
+                                <button class="selector-btn active" onclick="selectModel('iPhone 17 Pro', 549900, 'iphone171.png', this)">iPhone 17 Pro</button>
+                            </div>
+                        </div>
+
+                        <div class="config-section" id="color-section">
+                            <label>Színválaszték</label>
+                            <div class="selector-group">
+                                <button class="selector-btn active" onclick="changeColor('Deep Space', this)">Deep Space</button>
+                                <button class="selector-btn" onclick="changeColor('Titanium Silver', this)">Titanium Silver</button>
+                            </div>
+                        </div>
+
+                        <div class="config-section">
+                            <label>Kapacitás</label>
+                            <div class="selector-group" id="storage-selector-group">
+                                <button class="selector-btn active" onclick="updateStorage('256 GB', 0, this)">256 GB</button>
+                                <button class="selector-btn" onclick="updateStorage('512 GB', 80000, this)">512 GB</button>
+                                <button class="selector-btn" onclick="updateStorage('1 TB', 200000, this)">1 TB</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Vásárlói & Szállítási Információk</h3>
+                    <form class="checkout-form" onsubmit="handleOrder(event)">
+                        <div class="form-group">
+                            <label>Vevő teljes neve</label>
+                            <input type="text" id="form-name" placeholder="Kovács Brendon" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Pontos szállítási cím</label>
+                            <input type="text" id="form-address" placeholder="4024 Debrecen, Piac utca 10." required>
+                        </div>
+                        
+                        <div class="row-inputs">
+                            <div class="form-group">
+                                <label>E-mail cím</label>
+                                <input type="email" id="form-email" placeholder="info@velocore.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Telefonszám</label>
+                                <input type="tel" id="form-phone" placeholder="+36 30 555 1234" required>
+                            </div>
+                        </div>
+
+                        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin: 10px 0;">
+                        <h3>Biztonságos Fizetési Átjáró (Sandbox)</h3>
+
+                        <div class="form-group">
+                            <label>Kártyaszám</label>
+                            <input type="text" placeholder="4242 4242 4242 4242" maxlength="19" required>
+                        </div>
+
+                        <div class="row-inputs">
+                            <div class="form-group">
+                                <label>Lejárat</label>
+                                <input type="text" placeholder="12/29" maxlength="5" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Biztonsági kód (CVC)</label>
+                                <input type="password" placeholder="***" maxlength="3" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit">Fizetés és Rendelés Leadása</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="analitika" class="tab-panel">
+            <header class="header">
+                <h1>Adminisztrációs Vezérlőpult</h1>
+            </header>
+            
+            <div class="card">
+                <h3 style="color: white; margin-bottom: 20px;">Beérkező Élő Megrendelések (JavaScript DB)</h3>
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Vásárló Neve</th>
+                                <th>Cím</th>
+                                <th>Konfiguráció</th>
+                                <th>Fizetett Összeg</th>
+                                <th>Státusz</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-orders-body">
+                            <tr id="no-orders-row">
+                                <td colspan="5" style="text-align: center; color: #94A3B8; padding: 30px;">Még nem érkezett megrendelés a munkamenetben.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="beallitasok" class="tab-panel">
+            <header class="header">
+                <h1>Rendszer Beállítások</h1>
+            </header>
+            <div class="card">
+                <h3 style="color: white;">VELO.CORE Engine Állapota</h3>
+                <p style="color: #94A3B8; margin-top: 15px; line-height: 1.8;">
+                    Adatbázis mag: <span style="color: #34D399; font-weight: bold;">Helyi memóriatároló (Active)</span><br>
+                    Kártyás elszámolás: <span style="color: #22D3EE; font-weight: bold;">Stripe API szimuláció V3</span><br>
+                    Rendszer válaszidő: 1.2ms
+                </p>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="universal-toast" class="toast"></div>
+
+    <script>
+        // GLOBÁLIS ÁLLAPOTOK
+        let selectedModelName = "iPhone 17 Pro";
+        let baseModelPrice = 549900;
+        let storagePlusPrice = 0;
+        let currentStorage = "256 GB";
+        let currentColor = "Deep Space";
+        let currentImage = "iphone171.png";
+        let totalOrdersCount = 0;
+        
+        const databaseOrders = [];
+
+        // STABIL STÍLUSÚ NAVIGÁCIÓ
+        const links = document.querySelectorAll('.nav-link');
+        const panels = document.querySelectorAll('.tab-panel');
+
+        links.forEach(link => {
+            link.addEventListener('click', () => {
+                switchTab(link.getAttribute('data-target'));
+            });
+        });
+
+        // ÁLTALÁNOS FÜL-VÁLTÓ FÜGGVÉNY
+        function switchTab(targetId) {
+            links.forEach(l => {
+                if(l.getAttribute('data-target') === targetId) {
+                    l.classList.add('active');
+                } else {
+                    l.classList.remove('active');
+                }
+            });
+
+            panels.forEach(p => {
+                if(p.id === targetId) {
+                    p.classList.add('active');
+                } else {
+                    p.classList.remove('active');
+                }
+            });
+        }
+
+        // ÚJ: INTERAKTÍV KATTINTÁS A DASHBOARDON (Átvisz a shopba és beállítja a modellt)
+        function navigateToModel(modelName, basePrice, imgName, buttonIndex) {
+            // 1. Átváltunk a webshop fülre
+            switchTab('webshop');
+            
+            // 2. Megkeressük a webshopon belüli gombot és aktiváljuk a selectModel függvénnyel
+            const modelSelectorGroup = document.getElementById('model-selector-group');
+            const targetButton = modelSelectorGroup.children[buttonIndex];
+            
+            selectModel(modelName, basePrice, imgName, targetButton);
+        }
+
+        // MODELL KIVÁLASZTÁSA
+        function selectModel(modelName, basePrice, imgName, element) {
+            selectedModelName = modelName;
+            baseModelPrice = basePrice;
+            currentImage = imgName;
+            
+            const parent = element.parentElement;
+            parent.querySelectorAll('.selector-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            
+            document.getElementById('display-model-name').innerText = modelName;
+            
+            storagePlusPrice = 0;
+            const storageGroup = document.getElementById('storage-selector-group');
+            storageGroup.querySelectorAll('.selector-btn').forEach(btn => btn.classList.remove('active'));
+            storageGroup.children[0].classList.add('active');
+            currentStorage = "256 GB";
+
+            const shopImg = document.getElementById('shop-phone-img');
+            if(shopImg) shopImg.src = currentImage;
+
+            calculateFinalPrice();
+        }
+
+        // TÁRHELY FELÁR SZÁMÍTÁS
+        function updateStorage(storageSize, extraCost, element) {
+            currentStorage = storageSize;
+            storagePlusPrice = extraCost;
+            
+            const parent = element.parentElement;
+            parent.querySelectorAll('.selector-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            
+            calculateFinalPrice();
+        }
+
+        // VÉGLEGES ÁR KALKULÁTOR
+        function calculateFinalPrice() {
+            let finalPrice = baseModelPrice + storagePlusPrice;
+            document.getElementById('display-price').innerText = finalPrice.toLocaleString('hu-HU') + ' Ft';
+        }
+
+        // SZÍNVÁLASZTÓ
+        function changeColor(colorName, element) {
+            currentColor = colorName;
+            
+            const parent = element.parentElement;
+            parent.querySelectorAll('.selector-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            
+            const shopImg = document.getElementById('shop-phone-img');
+            if(shopImg) {
+                shopImg.src = currentImage; 
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('universal-toast');
+            toast.innerText = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+
+        // MEGRENDELÉS FELDOLGOZÁS
+        function handleOrder(event) {
+            event.preventDefault();
+            
+            const clientName = document.getElementById('form-name').value;
+            const clientAddress = document.getElementById('form-address').value;
+            let finalPrice = baseModelPrice + storagePlusPrice;
+            
+            const newOrder = {
+                name: clientName,
+                address: clientAddress,
+                product: `${selectedModelName} (${currentColor}, ${currentStorage})`,
+                price: finalPrice.toLocaleString('hu-HU') + ' Ft'
+            };
+
+            databaseOrders.push(newOrder);
+            
+            totalOrdersCount++;
+            document.getElementById('cart-count').innerText = totalOrdersCount;
+
+            renderAdminTable();
+
+            showToast(`✓ Sikeres fizetés! Köszönjük, ${clientName}.`);
+            event.target.reset();
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById('admin-orders-body');
+            const noOrdersRow = document.getElementById('no-orders-row');
+            
+            if(noOrdersRow) {
+                noOrdersRow.remove();
+            }
+
+            tbody.innerHTML = "";
+
+            databaseOrders.forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${order.name}</td>
+                    <td>${order.address}</td>
+                    <td style="color: #A78BFA; font-weight: 600;">${order.product}</td>
+                    <td style="color: #22D3EE; font-weight: 700;">${order.price}</td>
+                    <td><span class="status-badge">Fizetve</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
